@@ -13,6 +13,11 @@
 param environmentName string = 'dev'
 
 @description('The location of the resource group')
+@allowed([
+  'westus2'
+  'centralus'
+  'eastus'
+])
 param location string = 'westus2'
 
 @description('The name of the vm')
@@ -21,10 +26,10 @@ param vmName string = 'vmfleet-vm'
 @description('The size of the vm.')
 param vmSize string = 'Standard_B2s'
 
-// @description('The number of vm instances.')
-// @minValue(1)
-// @maxValue(5)
-// param vmInstanceCount int = 2
+@description('The number of vm instances.')
+@minValue(1)
+@maxValue(5)
+param vmInstanceCount int = 2
 
 @description('The Password of the VM.')
 @secure()
@@ -74,8 +79,8 @@ var subnetPrefix = '10.1.1.0/24'
 var networkSecurityGroupName = 'nsg-${vnetName}'
 var nicName = 'VMNic-${environmentName}'
 
-resource publicIp 'Microsoft.Network/publicIPAddresses@2022-05-01' = {
-  name: publicIpName
+resource publicIp 'Microsoft.Network/publicIPAddresses@2022-05-01' = [for i in range(1, vmInstanceCount):{
+  name: '${publicIpName}-${i}'
   location: location
   sku: {
     name: publicIpSku
@@ -83,13 +88,13 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2022-05-01' = {
   properties: {
     publicIPAllocationMethod: publicIPAllocationMethod
     dnsSettings: {
-      domainNameLabel: dnsLabelPrefix
+      domainNameLabel: '${dnsLabelPrefix}-${i}'
     }
   }
-}
+}]
 
-resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
-  name: vmName
+resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = [for i in range(1, vmInstanceCount): {
+  name: 'vm-${vmName}-${i}'
   location: location
   properties: {
     hardwareProfile: {
@@ -103,7 +108,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: nic.id
+          id: nic[i - 1].id
         }
       ]
     }
@@ -129,7 +134,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = {
       ]
     }
   }
-}
+}]
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-05-01' = {
   name: networkSecurityGroupName
@@ -176,8 +181,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   }
 }
 
-resource nic 'Microsoft.Network/networkInterfaces@2022-05-01' = {
-  name: nicName
+resource nic 'Microsoft.Network/networkInterfaces@2022-05-01' = [for i in range(1, vmInstanceCount): {
+  name: '${nicName}-${i}'
   location: location
   properties: {
     ipConfigurations: [
@@ -186,7 +191,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2022-05-01' = {
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
-            id: publicIp.id
+            id: publicIp[i - 1].id
           }
           subnet: {
             id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetName)
@@ -196,10 +201,9 @@ resource nic 'Microsoft.Network/networkInterfaces@2022-05-01' = {
     ]
   }
   dependsOn: [
-
     vnet
   ]
-}
+}]
 
 
 
