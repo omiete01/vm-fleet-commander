@@ -19,6 +19,13 @@ param location string = 'westus2'
 param vmName string = 'vm'
 
 @description('The size of the vm.')
+@allowed([
+  'Standard_B2s'
+  'Standard_B2als_v2'
+  'Standard_B2as_v2'
+  'Standard_B4als_v2'
+  'Standard_B4as_v2'
+])
 param vmSize string = 'Standard_B2s'
 
 @description('The number of vm instances.')
@@ -104,13 +111,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = [for i in range(1, 
           storageAccountType: 'Standard_LRS'
         }
       }
-      dataDisks: [
-        {
-          diskSizeGB: 1023
-          lun: 0
-          createOption: 'Empty'
-        }
-      ]
     }
   }
 }]
@@ -151,9 +151,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
         name: subnetName
         properties: {
           addressPrefix: subnetPrefix
-          networkSecurityGroup: {
-            id: nsg.id
-          }
+          // networkSecurityGroup: {
+          //   id: nsg.id
+          // }
         }
       }
     ]
@@ -178,6 +178,9 @@ resource nic 'Microsoft.Network/networkInterfaces@2022-05-01' = [for i in range(
         }
       }
     ]
+    networkSecurityGroup: {
+      id: nsg.id
+    }
   }
   dependsOn: [
     vnet

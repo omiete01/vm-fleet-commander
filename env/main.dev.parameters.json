@@ -2,32 +2,32 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "vmInstanceCount": {
+      "value": 1
+    },
+    "publicIpName": {
+      "value": "PublicIP"
+    },
+    "OSVersion": {
+      "value": "2022-datacenter-azure-edition"
+    },
+    "environmentName": {
+      "value": "dev"
+    },
     "location": {
-      "value": "westus2"
+      "value": "centralus"
     },
     "vmName": {
       "value": "vm"
     },
     "vmSize": {
-      "value": "Standard_B2s"
-    },
-    "vmInstanceCount": {
-      "value": 2
-    },
-    "publicIpName": {
-      "value": "PublicIP"
+      "value": "Standard_B4als_v2"
     },
     "publicIPAllocationMethod": {
       "value": "Static"
     },
     "publicIpSku": {
       "value": "Standard"
-    },
-    "OSVersion": {
-      "value": "2022-datacenter-azure-edition"
-    },
-    "environmentName": {
-      "value": "test"
-    }
+    } 
   }
 }
