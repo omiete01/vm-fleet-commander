@@ -21,7 +21,7 @@
       "value": "vm"
     },
     "vmSize": {
-      "value": "Standard_B2als_v2"
+      "value": "Standard_B4als_v2"
     },
     "publicIPAllocationMethod": {
       "value": "Static"

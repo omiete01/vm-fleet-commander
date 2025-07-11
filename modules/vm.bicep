@@ -9,9 +9,6 @@ param vmName string
 @description('The size of the vm.')
 param vmSize string 
 
-@description('The number of vm instances.')
-@minValue(1)
-@maxValue(5)
 param vmInstanceCount int
 
 @description('The Password of the VM.')
@@ -140,7 +137,4 @@ resource nic 'Microsoft.Network/networkInterfaces@2022-05-01' = [for i in range(
       id: nsg.id
     }
   }
-  // dependsOn: [
-  //   vnet
-  // ]
 }]

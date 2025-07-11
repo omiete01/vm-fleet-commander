@@ -1,4 +1,6 @@
 
+targetScope='subscription'
+
 @description('The name of the environment. This must be dev, test, or prod.')
 @allowed([
   'dev'
@@ -7,13 +9,26 @@
 ])
 param environmentName string = 'test'
 
-@description('The location of the resource group')
-@allowed([
-  'westus2'
-  'centralus'
-  'eastus'
-])
+// @description('The location of the resource group')
+// @allowed([
+//   'westus2'
+//   'centralus'
+//   'eastus'
+// ])
 param location string = 'westus2'
+
+@description('The name of the resource group.')
+param rgNameParam object = {
+  name: '${environmentName}-RG'
+  location: 'centralus'
+}
+
+
+@description('The tags assigned to the resource')
+param tags object = {
+  name: rgNameParam.name
+  value: environmentName
+}
 
 @description('The name of the vm')
 param vmName string = 'vm-${environmentName}'
@@ -31,7 +46,7 @@ param vmSize string = 'Standard_B2s'
 @description('The number of vm instances.')
 @minValue(1)
 @maxValue(5)
-param vmInstanceCount int = 2
+param vmInstanceCount int 
 
 @description('The Password of the VM.')
 @secure()
@@ -41,7 +56,7 @@ param adminPassword string
 param subnetName string = 'subnet-${vmName}'
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
-param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id, vmName)}')
+param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(rgNameParam.name, vmName)}')
 
 @description('Name for the Public IP used to access the Virtual Machine.')
 param publicIpName string = 'PublicIP'
@@ -65,8 +80,18 @@ var subnetPrefix = '10.1.1.0/24'
 var nsgName = 'nsg-${vnetName}'
 var nicName = 'VMNic-${environmentName}'
 
+module resourceGroupName 'modules/resource-group.bicep' = {
+  name: rgNameParam.name
+  params: {
+    location: location
+    tags: tags
+    resourceGroupName: rgNameParam.name
+  }
+}
+
 module vnet 'modules/vnet.bicep' = {
   name: vnetName
+  scope: resourceGroup(rgNameParam.name)
   params: {
     location: location
     subnetName: subnetName
@@ -74,10 +99,14 @@ module vnet 'modules/vnet.bicep' = {
     vnetAdressPrefix: vnetAdressPrefix
     vnetName: vnetName
   }
+  dependsOn: [
+    resourceGroupName
+  ]
 }
 
 module vm 'modules/vm.bicep' = {
   name: vmName
+  scope: resourceGroup(rgNameParam.name)
   params: {
     location: location
     OSVersion: OSVersion
