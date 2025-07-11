@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmInstanceCount": {
-      "value": 1
+      "value": 2
     },
     "publicIpName": {
       "value": "PublicIP"

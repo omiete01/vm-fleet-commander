@@ -9,12 +9,6 @@ targetScope='subscription'
 ])
 param environmentName string = 'test'
 
-// @description('The location of the resource group')
-// @allowed([
-//   'westus2'
-//   'centralus'
-//   'eastus'
-// ])
 param location string = 'westus2'
 
 @description('The name of the resource group.')
@@ -23,8 +17,7 @@ param rgNameParam object = {
   location: 'centralus'
 }
 
-
-@description('The tags assigned to the resource')
+@description('The tags assigned to the resource group.')
 param tags object = {
   name: rgNameParam.name
   value: environmentName
