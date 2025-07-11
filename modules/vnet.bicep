@@ -9,7 +9,7 @@ param subnetName string
 param vnetAdressPrefix string
 
 @description('The address prefix of the subnet.')
-param subnetAdressPrefix string
+param subnetPrefix string
 
 @description('The location of the virtual network.')
 param location string
@@ -27,10 +27,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
       {
         name: subnetName
         properties: {
-          addressPrefix: subnetAdressPrefix
+          addressPrefix: subnetPrefix
         }
       }
     ]
   }
 }
 
+output subnetid string = vnet.properties.subnets[0].id
