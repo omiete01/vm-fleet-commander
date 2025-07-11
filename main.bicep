@@ -21,7 +21,7 @@ param environmentName string = 'dev'
 param location string = 'westus2'
 
 @description('The name of the vm')
-param vmName string = 'vmfleet-vm'
+param vmName string = 'vm'
 
 @description('The size of the vm.')
 param vmSize string = 'Standard_B2s'
@@ -42,7 +42,7 @@ param subnetName string = 'subnet-${vmName}'
 param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id, vmName)}')
 
 @description('Name for the Public IP used to access the Virtual Machine.')
-param publicIpName string = 'PublicIP-${vmName}'
+param publicIpName string = 'PublicIP'
 
 @description('Allocation method for the Public IP used to access the Virtual Machine.')
 param publicIPAllocationMethod string = 'Static'
@@ -74,13 +74,19 @@ var adminUserName = 'vm-${environmentName}-admin'
 @description('The name of the Virtual Network.')
 var vnetName = 'vnet-${environmentName}'
 
-var vnetAdressPrefix = '10.1.0.0/16'
-var subnetPrefix = '10.1.1.0/24'
-var networkSecurityGroupName = 'nsg-${vnetName}'
+var vnetAdressPrefix = [
+  for i in range(1, vmInstanceCount): '10.${i}.0.0/16'
+]
+
+var subnetPrefix = [
+  for i in range(1, vmInstanceCount): '10.${i}.${i}.0/24'
+]
+
+var nsgName = 'nsg-${vnetName}'
 var nicName = 'VMNic-${environmentName}'
 
 resource publicIp 'Microsoft.Network/publicIPAddresses@2022-05-01' = [for i in range(1, vmInstanceCount):{
-  name: '${publicIpName}-${i}'
+  name: '${publicIpName}-${environmentName}-${i}'
   location: location
   sku: {
     name: publicIpSku
@@ -94,7 +100,7 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2022-05-01' = [for i in r
 }]
 
 resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = [for i in range(1, vmInstanceCount): {
-  name: 'vm-${vmName}-${i}'
+  name: '${vmName}-${environmentName}-${i}'
   location: location
   properties: {
     hardwareProfile: {
@@ -136,8 +142,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-11-01' = [for i in range(1, 
   }
 }]
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-05-01' = {
-  name: networkSecurityGroupName
+resource nsg 'Microsoft.Network/networkSecurityGroups@2022-05-01' = {
+  name: nsgName
   location: location
   properties: {
     securityRules: [
@@ -165,15 +171,16 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   properties: {
     addressSpace: {
       addressPrefixes: [
-        vnetAdressPrefix
+        // Expand the vnetAdressPrefix array elements here
+        for prefix in vnetAdressPrefix: prefix
       ]
     }
     subnets: [{
         name: subnetName
         properties: {
-          addressPrefix: subnetPrefix
+          addressPrefix: subnetPrefix[0]
           networkSecurityGroup: {
-            id: networkSecurityGroup.id
+            id: nsg.id
           }
         }
       }
