@@ -8,6 +8,7 @@ You can view my article [here](https://omiete-projects.hashnode.dev/use-bicep-to
 
 The repository is organized as follows:
 
+```bash
 ├── modules/
 │   ├── resource-group.bicep
 │   ├── vm.bicep
@@ -18,6 +19,7 @@ The repository is organized as follows:
 │   ├── main.test.parameters.json
 │   └── main.prod.parameters.json
 └──README.md
+```
 
 <img width="377" height="291" alt="vm_fleet_visualiser" src="https://github.com/user-attachments/assets/18663f69-e796-4b75-b7b3-78e796f286f1" />
 
