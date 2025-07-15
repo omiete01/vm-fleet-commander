@@ -1,6 +1,8 @@
 # Overview
 
-This repository demonstrates how to create and deploy Azure resources at the subscription level using Bicep , Microsoft's modern Infrastructure-as-Code (IaC) language.
+This repository demonstrates how to create and deploy Azure resources at the subscription level using Bicep, Microsoft's modern Infrastructure-as-Code (IaC) language.
+
+<img width="377" height="291" alt="vm_fleet_visualiser" src="https://github.com/user-attachments/assets/cdfd8302-d72a-44bd-bdae-90448b3adac5" />
 
 ### Repository Structure
 
@@ -50,5 +52,15 @@ Validate your Bicep template to ensure it is free of syntax errors. Replace $loc
 
 #### Deploy the Bicep Template
 
-Run the following command to deploy the resources at the subsription level. Replace $location with the region you want to deploy in. Example: `centralus`
+Run the following command to deploy the resources at the subscription level. Replace $location with the region you want to deploy in. Example: `centralus`
 `az deployment sub create --name main --resource-group $location --template-file main.bicep --parameters main.dev.parameters.json`
+
+<img width="486" height="211" alt="vm-deploy" src="https://github.com/user-attachments/assets/d9d4fa21-cd2c-480f-a7a9-972e28fbad2d" />
+
+## Resources
+Here are some helpful resources to learn more about Bicep and Azure deployments:
+
+Bicep Documentation
+Azure CLI Documentation
+Subscription-Level Deployments in Bicep
+Bicep Playground
